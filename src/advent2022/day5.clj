@@ -1,7 +1,6 @@
 (ns advent2022.day5
   (:require [clojure.string :as str]))
 
-
 (def input-txt (slurp "input/day5.txt"))
 
 (defn parse-input
@@ -89,4 +88,3 @@
   (puzzle-2 input-txt)
   ;; => "HRFTQVWNN"
   )
-

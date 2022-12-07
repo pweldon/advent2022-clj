@@ -1,4 +1,6 @@
-{:paths ["src" "test"]
- :deps  {}
- :aliases 
- {:neil {:project {:name advent2022/advent2022}}}}
+{:paths   ["src" "test"]
+ :deps    {}
+ :aliases {
+           :neil {:project {:name advent2022/advent2022}
+                  }
+           }}
