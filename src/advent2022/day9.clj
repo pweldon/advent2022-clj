@@ -49,7 +49,7 @@
 
 (defn move-tail
   [state n]
-  (do
+  (
     (cond
       (> 2 (max-distance (get-in state [:knots (dec n)]) (get-in state [:knots n]))) state
       (= (get-in state [:knots (dec n) :x]) (get-in state [:knots n :x]) (move-tail' state n :x))
