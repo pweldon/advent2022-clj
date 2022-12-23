@@ -1,4 +1,4 @@
-(ns advent2022.day12
+(ns advent2022.day12-1
   (:require [clojure.string :as str]
             [clojure.test :refer [deftest is]]))
 
@@ -34,8 +34,8 @@
 (defn add-start-end
   [cell]
   (condp = (:h cell)
-    \S (assoc cell :h \a :type :start :dist 0)
-    \E (assoc cell :h \z :type :end)
+    \S (assoc cell :h \a :type :start)
+    \E (assoc cell :h \z :type :end :dist 0)
     cell))
 
 (defn elevation-to-int
@@ -56,12 +56,11 @@
 (defn next-node-to-visit
   [state]
   (let [unvisited-nodes (filter #(and (not (:visited %)) (< (:dist %) Integer/MAX_VALUE)) (vals state))]
-    (if 
-     (empty? unvisited-nodes) 
-      nil 
-        (let [min-dist-node (apply min-key :dist unvisited-nodes)]
-          [(:x min-dist-node) (:y min-dist-node)]))
-    ))
+    (if
+     (empty? unvisited-nodes)
+      nil
+      (let [min-dist-node (apply min-key :dist unvisited-nodes)]
+        [(:x min-dist-node) (:y min-dist-node)]))))
 
 (defn update-neighbour-dist'
   [state x y x' y']
@@ -72,28 +71,27 @@
         new-y (+ (:y current-node) y')]
     (if-let [new-node (get state [new-x new-y])]
       (let [new-dist (+ current-dist 1)]
-        (prn new-node)
+        ;;(prn new-node)
         (if (or
              (:visited new-node) ;; node has already been visited
-             (< 1 (- (:h new-node) current-height)) ;; height difference is too large
+             (< 1 (- current-height (:h new-node))) ;; height difference is too large
              (> new-dist (:dist new-node)) ;; path is not shorter
              )
           state ;; nothing to do return state unchanged
           ;; found a shorter path to new-node, update state
-           (assoc state [new-x new-y] (assoc new-node :dist new-dist)))) 
-      state)
-      ))
+          (assoc state [new-x new-y] (assoc new-node :dist new-dist))))
+      state)))
 
 (defn update-neightbours
   [state x y]
-  (print-state state)
+  ;;(print-state state)
   (reduce #(apply update-neighbour-dist' %1 x y %2) state [[0 1] [0 -1] [1 0] [-1 0]]))
 
 (defn dijkstra'
   [state]
   (if-let [next-node (next-node-to-visit state)]
     (let [[min-x min-y] next-node]
-        (update (update-neightbours state min-x min-y) [min-x min-y] #(assoc % :visited true)))
+      (update (update-neightbours state min-x min-y) [min-x min-y] #(assoc % :visited true)))
     (reduced state)))
 
 (defn dijkstra
@@ -103,25 +101,20 @@
 ;; part 1
 
 
-(defn puzzle-1
-  [input]
-  (let [state (parse-input input)
-        end (first (filter #(= :end (:type %)) (vals state)))
-        d (dijkstra state)
-        dist (get-in d [[(:x end) (:y end)] :dist])]
-    (print-state d)
-    dist))
-
-;; part 2
-
 (defn puzzle-2
   [input]
-  0)
+  (let [state (parse-input input)
+        d (dijkstra state)
+        ds (filter #(= (:h %) 0) (vals d))
+        shortest-d (apply min (map :dist ds))]
+    (print-state d)
+    shortest-d))
+
 
 (comment
-  (puzzle-1 input-txt)
-  ;; => 528
   (puzzle-2 input-txt)
-  ;; => 25738411485 
+  ;; => 528
   ;;
+  (puzzle-2 example-input)
+  ;; => 29
   )
